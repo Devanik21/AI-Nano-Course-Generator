@@ -323,6 +323,12 @@ st.markdown("""
         height: 20px;
         border-radius: 10px;
     }
+    /* Make the tabs scrollable horizontally */
+    [data-baseweb="tab-list"] {
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+    }
 </style>
 """, unsafe_allow_html=True)
 
