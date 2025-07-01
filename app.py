@@ -26,7 +26,7 @@ def generate_course_content(topic, api_key):
     """
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash')
 
         prompt = f"""
         You are an expert instructional designer. Your task is to create a nano-course on the topic: "{topic}".
