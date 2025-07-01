@@ -330,9 +330,16 @@ st.markdown('<h1 class="main-header">🎓 Advanced Course Generator Pro</h1>', u
 st.markdown("### Transform any topic into a comprehensive, personalized learning experience with AI-powered curriculum design")
 
 # Initialize session state
-for key in ['course_content', 'quiz_submitted', 'current_section', 'learning_progress', 'study_start_time']:
-    if key not in st.session_state:
-        st.session_state[key] = None if key != 'current_section' else 0
+if 'course_content' not in st.session_state:
+    st.session_state.course_content = None
+if 'quiz_submitted' not in st.session_state:
+    st.session_state.quiz_submitted = False
+if 'current_section' not in st.session_state:
+    st.session_state.current_section = 0
+if 'learning_progress' not in st.session_state:
+    st.session_state.learning_progress = {}
+if 'study_start_time' not in st.session_state:
+    st.session_state.study_start_time = None
 
 # --- Sidebar Configuration ---
 with st.sidebar:
