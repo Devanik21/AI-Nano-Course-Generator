@@ -109,9 +109,10 @@ Released under the **MIT License** — you’re free to use, modify, and share t
 
 ---
 
-## 🌈 Live Demo (optional)
+## 🌈 Live Demo 
 
-*You can host this app on Streamlit Cloud. Insert your deployed link here for public access.*
+https://ai-nano-course-generator-b9mtxbsb245gttr92eekmh.streamlit.app/
+
 
 ---
 
