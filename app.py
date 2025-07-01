@@ -465,6 +465,27 @@ if st.session_state.course_content:
     if st.session_state.study_start_time:
         study_time = (time.time() - st.session_state.study_start_time) / 60  # Convert to minutes
     
+    # Calculate quiz score and difficulty breakdown if submitted
+    score = 0
+    score_percentage = 0
+    results_by_difficulty = {'easy': {'correct': 0, 'total': 0}, 'medium': {'correct': 0, 'total': 0}, 'hard': {'correct': 0, 'total': 0}}
+    if st.session_state.quiz_submitted:
+        quiz_questions = course['comprehensive_quiz']
+        if quiz_questions and 'user_answers' in st.session_state:
+            for i, q in enumerate(quiz_questions):
+                if i < len(st.session_state.user_answers):
+                    user_answer = st.session_state.user_answers[i]
+                    difficulty = q.get('difficulty', 'medium')
+                    
+                    if difficulty in results_by_difficulty:
+                        results_by_difficulty[difficulty]['total'] += 1
+                    
+                    if user_answer == q['answer']:
+                        score += 1
+                        if difficulty in results_by_difficulty:
+                            results_by_difficulty[difficulty]['correct'] += 1
+            score_percentage = (score / len(quiz_questions)) * 100 if quiz_questions else 0
+
     # Course Overview Dashboard
     st.header("📊 Course Overview")
     
@@ -577,27 +598,10 @@ if st.session_state.course_content:
         st.subheader("📈 Assessment Results")
         
         quiz_questions = course['comprehensive_quiz']
-        score = 0
-        results_by_difficulty = {'easy': {'correct': 0, 'total': 0}, 'medium': {'correct': 0, 'total': 0}, 'hard': {'correct': 0, 'total': 0}}
-        
-        # Calculate detailed scores
-        for i, q in enumerate(quiz_questions):
-            user_answer = st.session_state.user_answers[i]
-            correct_answer = q['answer']
-            difficulty = q.get('difficulty', 'medium')
-            
-            results_by_difficulty[difficulty]['total'] += 1
-            
-            if user_answer == correct_answer:
-                score += 1
-                results_by_difficulty[difficulty]['correct'] += 1
-        
-        # Display overall score
-        score_percentage = (score / len(quiz_questions)) * 100
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("Overall Score", f"{score}/{len(quiz_questions)}")
+            st.metric("Overall Score", f"{score}/{len(quiz_questions)}" if quiz_questions else "N/A")
         with col2:
             st.metric("Percentage", f"{score_percentage:.1f}%")
         with col3:
@@ -792,7 +796,7 @@ if st.session_state.course_content:
         # Update progress data
         progress_data = {
             'overall_progress': 75,  # This would be calculated based on actual completion
-            'quiz_score': score_percentage if st.session_state.quiz_submitted else 0,
+            'quiz_score': score_percentage,
             'study_time': int(study_time),
             'completion_rate': 85,  # Based on sections completed, quizzes taken, etc.
             'section_progress': {f"Section {i+1}": min(100, (i+1) * 25) for i in range(len(course['course_sections']))}
