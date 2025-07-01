@@ -1,68 +1,7 @@
-# Core Streamlit and UI
-streamlit>=1.28.0
-streamlit-option-menu>=0.3.6
-
-# Google Gemini AI
-google-generativeai>=0.3.0
-
-# Data Manipulation and Analysis
-pandas>=2.0.0
-numpy>=1.24.0
-
-# Visualization and Charts
-plotly>=5.15.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
-
-# Environment and Configuration
+streamlit>=1.32.0
+google-generativeai>=0.3.2
 python-dotenv>=1.0.0
-
-# JSON and Data Processing
-jsonschema>=4.17.0
-
-# Date and Time Handling
-python-dateutil>=2.8.0
-
-# Text Processing and NLP (optional for advanced features)
-nltk>=3.8.0
-textstat>=0.7.0
-
-# PDF Generation (for export features)
-reportlab>=4.0.0
-weasyprint>=59.0
-
-# Excel/CSV Processing
-openpyxl>=3.1.0
-xlsxwriter>=3.1.0
-
-# Image Processing (for certificates and graphics)
-Pillow>=10.0.0
-
-# HTTP Requests (for potential API integrations)
-requests>=2.31.0
-
-# Caching and Performance
-streamlit-lottie>=0.0.5
-streamlit-aggrid>=0.3.4
-
-# Security and Validation
-pydantic>=2.0.0
-cryptography>=41.0.0
-
-# Additional Streamlit Components
-streamlit-chat>=0.1.1
-streamlit-drawable-canvas>=0.9.0
-streamlit-card>=0.0.5
-
-# Testing (optional)
-pytest>=7.4.0
-pytest-streamlit>=1.0.0
-
-# Code Quality (optional)
-black>=23.7.0
-flake8>=6.0.0
-mypy>=1.5.0
-
-# Documentation (optional)
-sphinx>=7.1.0
-sphinx-rtd-theme>=1.3.0
+pandas>=2.2.2
+plotly>=5.20.0
+# Optional for faster cold start and better UI handling
+watchdog>=4.0.0
