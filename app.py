@@ -72,7 +72,7 @@ def generate_course_id(topic: str, duration: int, difficulty: str) -> str:
 
 def save_progress(course_id: str, progress_data: Dict):
     """Save learning progress to session state."""
-    if 'learning_progress' not in st.session_state:
+    if 'learning_progress' not in st.session_state or st.session_state.learning_progress is None:
         st.session_state.learning_progress = {}
     st.session_state.learning_progress[course_id] = progress_data
 
