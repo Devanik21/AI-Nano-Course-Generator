@@ -312,7 +312,7 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .feature-card {
-        background: #f8f9fa;
+        background: #262730; /* Dark background for flashcards */
         padding: 1rem;
         border-radius: 10px;
         border-left: 4px solid #667eea;
