@@ -454,6 +454,11 @@ if generate_button:
 if st.session_state.course_content:
     course = st.session_state.course_content
     
+    # Calculate study time once for use throughout the display logic
+    study_time = 0
+    if st.session_state.study_start_time:
+        study_time = (time.time() - st.session_state.study_start_time) / 60  # Convert to minutes
+    
     # Course Overview Dashboard
     st.header("📊 Course Overview")
     
@@ -769,11 +774,6 @@ if st.session_state.course_content:
     # Learning Analytics Dashboard
     if st.session_state.get('show_analytics'):
         st.header("📊 Learning Analytics Dashboard")
-        
-        # Calculate current progress
-        study_time = 0
-        if st.session_state.study_start_time:
-            study_time = (time.time() - st.session_state.study_start_time) / 60  # Convert to minutes
         
         # Update progress data
         progress_data = {
