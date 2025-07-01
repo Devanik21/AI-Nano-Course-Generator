@@ -495,41 +495,44 @@ if st.session_state.course_content:
     # Section Navigation
     st.header("📚 Course Content")
     
+    # Use a selectbox for navigation if there are multiple sections
     if len(course['course_sections']) > 1:
-        section_tabs = st.tabs([f"Section {i+1}: {section['title']}" for i, section in enumerate(course['course_sections'])])
-        
-        for i, tab in enumerate(section_tabs):
-            with tab:
-                section = course['course_sections'][i]
-                
-                # Section header
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.subheader(section['title'])
-                with col2:
-                    st.info(f"⏱️ {section.get('duration_minutes', 'N/A')} min")
-                
-                # Learning outcomes
-                if section.get('learning_outcomes'):
-                    with st.expander("🎯 Learning Outcomes"):
-                        for outcome in section['learning_outcomes']:
-                            st.write(f"• {outcome}")
-                
-                # Section content
-                st.markdown(section['content'])
-                
-                # Key concepts
-                if section.get('key_concepts'):
-                    st.subheader("🔑 Key Concepts")
-                    concept_cols = st.columns(min(3, len(section['key_concepts'])))
-                    for j, concept in enumerate(section['key_concepts']):
-                        with concept_cols[j % 3]:
-                            st.info(concept)
+        section_titles = [f"Section {i+1}: {s['title']}" for i, s in enumerate(course['course_sections'])]
+        selected_title = st.selectbox(
+            "Navigate Course Sections",
+            options=section_titles,
+            key="section_selector",
+            label_visibility="collapsed"
+        )
+        selected_index = section_titles.index(selected_title)
+        section = course['course_sections'][selected_index]
     else:
-        # Single section course
         section = course['course_sections'][0]
+
+    # Display the selected (or only) section
+    # Section header
+    col1, col2 = st.columns([3, 1])
+    with col1:
         st.subheader(section['title'])
-        st.markdown(section['content'])
+    with col2:
+        st.info(f"⏱️ {section.get('duration_minutes', 'N/A')} min")
+    
+    # Learning outcomes
+    if section.get('learning_outcomes'):
+        with st.expander("🎯 Learning Outcomes"):
+            for outcome in section['learning_outcomes']:
+                st.write(f"• {outcome}")
+    
+    # Section content
+    st.markdown(section['content'])
+    
+    # Key concepts
+    if section.get('key_concepts'):
+        st.subheader("🔑 Key Concepts")
+        concept_cols = st.columns(min(3, len(section['key_concepts'])))
+        for j, concept in enumerate(section['key_concepts']):
+            with concept_cols[j % 3]:
+                st.info(concept)
     
     st.divider()
     
@@ -696,33 +699,38 @@ if st.session_state.course_content:
     st.header("💻 Practical Examples & Code")
     
     if course.get('practical_examples'):
-        example_tabs = st.tabs([f"Example {i+1}: {ex['title']}" for i, ex in enumerate(course['practical_examples'])])
+        example_titles = [f"Example {i+1}: {ex['title']}" for i, ex in enumerate(course['practical_examples'])]
+        selected_example_title = st.selectbox(
+            "Choose an Example",
+            options=example_titles,
+            key="example_selector",
+            label_visibility="collapsed"
+        )
+        selected_index = example_titles.index(selected_example_title)
+        example = course['practical_examples'][selected_index]
         
-        for i, tab in enumerate(example_tabs):
-            with tab:
-                example = course['practical_examples'][i]
-                
-                st.subheader(example['title'])
-                st.write(example['description'])
-                
-                # Code display
-                if example.get('code'):
-                    st.code(example['code'], language=example.get('language', 'text'))
-                
-                # Explanation
-                if example.get('explanation'):
-                    with st.expander("📝 Step-by-step Explanation"):
-                        st.write(example['explanation'])
-                
-                # Variations
-                if example.get('variations'):
-                    with st.expander("🔄 Alternative Approaches"):
-                        for j, variation in enumerate(example['variations']):
-                            st.write(f"**Approach {j+1}:** {variation}")
-                
-                # Real-world application
-                if example.get('real_world_application'):
-                    st.info(f"🌍 **Real-world Application:** {example['real_world_application']}")
+        # Display the selected example
+        st.subheader(example['title'])
+        st.write(example['description'])
+        
+        # Code display
+        if example.get('code'):
+            st.code(example['code'], language=example.get('language', 'text'))
+        
+        # Explanation
+        if example.get('explanation'):
+            with st.expander("📝 Step-by-step Explanation"):
+                st.write(example['explanation'])
+        
+        # Variations
+        if example.get('variations'):
+            with st.expander("🔄 Alternative Approaches"):
+                for j, variation in enumerate(example['variations']):
+                    st.write(f"**Approach {j+1}:** {variation}")
+        
+        # Real-world application
+        if example.get('real_world_application'):
+            st.info(f"🌍 **Real-world Application:** {example['real_world_application']}")
     
     st.divider()
     
