@@ -6,3 +6,4 @@ plotly>=5.20.0
 # Optional for faster cold start and better UI handling
 markdown2
 watchdog>=4.0.0
+weasyprint
