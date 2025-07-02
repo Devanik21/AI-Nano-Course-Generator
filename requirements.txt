@@ -7,4 +7,4 @@ plotly>=5.20.0
 markdown2
 watchdog>=4.0.0
 weasyprint
-
+markdown-to-docx
