@@ -11,6 +11,8 @@ import plotly.graph_objects as go
 from dotenv import load_dotenv
 from typing import Dict, List, Optional, Tuple
 import hashlib
+import markdown2
+from weasyprint import HTML
 import base64
 
 # Load environment variables from .env file
@@ -274,20 +276,105 @@ def display_learning_analytics(progress_data: Dict):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-def export_course_content(course_data: Dict, format_type: str = "markdown"):
-    """Export course content in various formats."""
-    if format_type == "markdown":
-        content = f"# {course_data['course_metadata']['topic']}\n\n"
-        content += f"**Duration:** {course_data['course_metadata']['duration_minutes']} minutes\n"
-        content += f"**Difficulty:** {course_data['course_metadata']['difficulty']}\n\n"
-        
-        for section in course_data['course_sections']:
-            content += f"## {section['title']}\n\n"
-            content += f"{section['content']}\n\n"
-        
-        return content
+def _generate_full_course_markdown(course_data: Dict) -> str:
+    """Helper to generate the full course content in Markdown format."""
+    metadata = course_data.get('course_metadata', {})
+    topic = metadata.get('topic', 'Course')
     
-    # Add more export formats as needed
+    content = f"# Course: {topic}\n\n"
+    content += f"**Duration:** {metadata.get('duration_minutes')} minutes  \n"
+    content += f"**Difficulty:** {metadata.get('difficulty')}  \n"
+    content += f"**Learning Style:** {metadata.get('learning_style')}  \n"
+    content += f"**Target Audience:** {metadata.get('target_audience', 'N/A')}  \n"
+    content += f"**Prerequisites:** {metadata.get('prerequisites', 'None')}  \n\n"
+
+    if metadata.get('learning_objectives'):
+        content += "## Learning Objectives\n"
+        for obj in metadata['learning_objectives']:
+            content += f"- {obj}\n"
+        content += "\n"
+
+    if course_data.get('course_sections'):
+        content += "# Course Content\n"
+        for section in course_data['course_sections']:
+            content += f"## Section: {section.get('title', 'Untitled Section')}\n"
+            content += f"_{section.get('duration_minutes', 'N/A')} minutes_\n\n"
+            content += f"{section.get('content', '')}\n\n"
+            if section.get('key_concepts'):
+                content += "### Key Concepts\n"
+                for concept in section['key_concepts']:
+                    content += f"- {concept}\n"
+                content += "\n"
+
+    if course_data.get('comprehensive_quiz'):
+        content += "# Comprehensive Quiz\n"
+        for i, q in enumerate(course_data['comprehensive_quiz']):
+            content += f"### Question {i+1}: {q.get('question', '')}\n"
+            options = "\n".join([f"- {opt}" for opt in q.get('options', [])])
+            content += f"{options}\n\n"
+            content += f"**Answer:** {q.get('answer', 'N/A')}\n"
+            content += f"**Explanation:** {q.get('explanation', 'N/A')}\n\n"
+    
+    if course_data.get('flashcards'):
+        content += "# Flashcards\n"
+        for card in course_data['flashcards']:
+            content += f"### {card.get('term', 'Term')}\n"
+            content += f"**Definition:** {card.get('definition', 'N/A')}\n"
+            if card.get('example'):
+                content += f"**Example:** {card.get('example')}\n"
+            content += "\n"
+
+    if course_data.get('practical_examples'):
+        content += "# Practical Examples\n"
+        for ex in course_data['practical_examples']:
+            content += f"## Example: {ex.get('title', 'Untitled Example')}\n"
+            content += f"_{ex.get('description', '')}_\n\n"
+            if ex.get('code'):
+                content += f"```{ex.get('language', '')}\n{ex.get('code')}\n```\n\n"
+            if ex.get('explanation'):
+                content += f"**Explanation:**\n{ex.get('explanation')}\n\n"
+
+    if course_data.get('assignments'):
+        content += "# Assignments\n"
+        for assign in course_data['assignments']:
+            content += f"## Assignment: {assign.get('title', 'Untitled Assignment')}\n"
+            content += f"**Description:** {assign.get('description', 'N/A')}\n"
+            content += f"**Difficulty:** {assign.get('difficulty', 'N/A')}\n\n"
+
+    return content
+
+def export_course_content(course_data: Dict, format_type: str = "markdown") -> Optional[bytes or str]:
+    """Export course content in various formats."""
+    markdown_content = _generate_full_course_markdown(course_data)
+
+    if format_type == "markdown":
+        return markdown_content
+    elif format_type == "pdf":
+        try:
+            css = """
+            @page { size: A4; margin: 1.5cm; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; }
+            h1, h2, h3, h4, h5, h6 { font-weight: bold; color: #000; }
+            h1 { font-size: 24pt; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-top: 0; }
+            h2 { font-size: 18pt; color: #764ba2; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 2em; }
+            h3 { font-size: 14pt; color: #333; margin-top: 1.5em; }
+            code { background-color: #f1f1f1; padding: 2px 5px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 0.9em; }
+            pre { background-color: #f6f8fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; border: 1px solid #ddd; }
+            pre code { background-color: transparent; padding: 0; border-radius: 0; border: none; }
+            blockquote { border-left: 4px solid #ccc; padding-left: 10px; color: #666; }
+            """
+            html_content = markdown2.markdown(markdown_content, extras=["fenced-code-blocks", "tables", "break-on-newline"])
+            full_html = f'<!DOCTYPE html><html><head><meta charset="UTF-8"><style>{css}</style></head><body>{html_content}</body></html>'
+            
+            pdf_bytes = HTML(string=full_html).write_pdf()
+            return pdf_bytes
+        except ImportError:
+            st.error("PDF generation requires `weasyprint` and `markdown2`. Please install them: `pip install weasyprint markdown2`")
+            return None
+        except Exception as e:
+            st.error(f"An error occurred during PDF generation: {e}")
+            return None
+
     return None
 
 # --- Streamlit App UI ---
@@ -376,10 +463,11 @@ with st.sidebar:
     with st.expander("🎯 Advanced Options"):
         prerequisites = st.text_area("Prerequisites:", placeholder="List any required background knowledge...")
         
-        learning_objectives = st.text_area(
+        learning_objectives_input = st.text_area(
             "Learning Objectives (one per line):", 
             placeholder="What should students achieve?\nObjective 1\nObjective 2..."
-        ).split('\n') if st.text_area("Learning Objectives (one per line):", placeholder="What should students achieve?\nObjective 1\nObjective 2...") else []
+        )
+        learning_objectives = [obj.strip() for obj in learning_objectives_input.split('\n') if obj.strip()]
         
         include_assignments = st.checkbox("Include Assignments", value=True)
         include_resources = st.checkbox("Include Additional Resources", value=True)
@@ -1037,7 +1125,15 @@ Generated by Advanced Course Generator Pro
     
     with col1:
         if st.button("📑 Export as PDF"):
-            st.info("PDF export feature would be implemented with additional libraries like reportlab or weasyprint")
+            with st.spinner("Generating PDF..."):
+                pdf_content = export_course_content(st.session_state.course_content, format_type="pdf")
+                if pdf_content:
+                    st.download_button(
+                        label="📥 Download PDF",
+                        data=pdf_content,
+                        file_name=f"{topic.replace(' ', '_')}_course.pdf",
+                        mime="application/pdf"
+                    )
     
     with col2:
         if st.button("📊 Export Progress Report"):
