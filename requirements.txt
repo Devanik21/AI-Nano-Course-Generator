@@ -7,7 +7,4 @@ plotly>=5.20.0
 markdown2
 watchdog>=4.0.0
 weasyprint
-libpango-1.0-0
-libharfbuzz0b
-libpangoft2-1.0-0
-libgdk-pixbuf2.0-0
+
