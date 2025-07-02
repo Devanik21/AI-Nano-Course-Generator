@@ -15,7 +15,7 @@ import markdown2
 from weasyprint import HTML
 import base64
 from io import BytesIO
-import markdown_to_docx
+
 
 # Load environment variables from .env file
 load_dotenv()
