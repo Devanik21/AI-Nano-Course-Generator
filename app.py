@@ -376,24 +376,7 @@ def export_course_content(course_data: Dict, format_type: str = "markdown") -> O
         except Exception as e:
             st.error(f"An error occurred during PDF generation: {e}")
             return None
-    elif format_type == "docx":
-        try:
-            document = markdown_to_docx.markdown_to_docx(markdown_content)
-            
-            # Save the document to a byte stream in memory
-            doc_io = BytesIO()
-            document.save(doc_io)
-            doc_io.seek(0) # Rewind the buffer to the beginning
-            
-            return doc_io.getvalue()
-        except ImportError:
-            st.error("DOCX generation requires `markdown-to-docx`. Please install it: `pip install markdown-to-docx`")
-            return None
-        except Exception as e:
-            st.error(f"An error occurred during DOCX generation: {e}")
-            return None
 
-    return None
 
 # --- Streamlit App UI ---
 
